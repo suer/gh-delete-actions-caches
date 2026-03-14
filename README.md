@@ -26,8 +26,8 @@ At least one of `--key-prefix` or `--ref-prefix` is required.
 
 ### Flags
 
-- `--key-prefix`: Delete caches whose key starts with this prefix
-- `--ref-prefix`: Delete caches whose ref starts with this prefix
+- `-k, --key-prefix`: Delete caches whose key starts with this prefix
+- `-r, --ref-prefix`: Delete caches whose ref starts with this prefix
 - `-d, --dryrun`: List caches to be deleted without actually deleting
 - `-R, --repo`: Target repository (`OWNER/REPO`). Defaults to the repository of the current directory
 - `--version`: Show version

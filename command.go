@@ -29,8 +29,8 @@ func rootCmd() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&opts.Version, "version", false, "show version")
-	cmd.Flags().StringVar(&opts.KeyPrefix, "key-prefix", "", "delete caches whose key starts with this prefix")
-	cmd.Flags().StringVar(&opts.RefPrefix, "ref-prefix", "", "delete caches whose ref starts with this prefix")
+	cmd.Flags().StringVarP(&opts.KeyPrefix, "key-prefix", "k", "", "delete caches whose key starts with this prefix")
+	cmd.Flags().StringVarP(&opts.RefPrefix, "ref-prefix", "r", "", "delete caches whose ref starts with this prefix")
 	cmd.Flags().BoolVarP(&opts.DryRun, "dryrun", "d", false, "list caches to be deleted without actually deleting")
 	cmd.Flags().StringVarP(&opts.Repo, "repo", "R", "", "target repository (OWNER/REPO)")
 
