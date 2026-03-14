@@ -19,12 +19,15 @@ type listCachesResponse struct {
 	ActionsCaches []ActionsCache `json:"actions_caches"`
 }
 
-func fetchCaches(client *api.RESTClient, repo repository.Repository) ([]ActionsCache, error) {
+func fetchCaches(client *api.RESTClient, repo repository.Repository, keyPrefix string) ([]ActionsCache, error) {
 	var all []ActionsCache
 	page := 1
 	for {
 		var resp listCachesResponse
 		url := fmt.Sprintf("repos/%s/%s/actions/caches?per_page=100&page=%d", repo.Owner, repo.Name, page)
+		if keyPrefix != "" {
+			url += "&key=" + keyPrefix
+		}
 		if err := client.Get(url, &resp); err != nil {
 			return nil, err
 		}
@@ -37,16 +40,15 @@ func fetchCaches(client *api.RESTClient, repo repository.Repository) ([]ActionsC
 	return all, nil
 }
 
-func filterCaches(caches []ActionsCache, opts *Options) []ActionsCache {
+func filterCaches(caches []ActionsCache, refPrefix string) []ActionsCache {
+	if refPrefix == "" {
+		return caches
+	}
 	var result []ActionsCache
 	for _, cache := range caches {
-		if opts.KeyPrefix != "" && !strings.HasPrefix(cache.Key, opts.KeyPrefix) {
-			continue
+		if strings.HasPrefix(cache.Ref, refPrefix) {
+			result = append(result, cache)
 		}
-		if opts.RefPrefix != "" && !strings.HasPrefix(cache.Ref, opts.RefPrefix) {
-			continue
-		}
-		result = append(result, cache)
 	}
 	return result
 }

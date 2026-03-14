@@ -13,12 +13,12 @@ func deleteCaches(repo repository.Repository, opts *Options) error {
 		return err
 	}
 
-	caches, err := fetchCaches(client, repo)
+	caches, err := fetchCaches(client, repo, opts.KeyPrefix)
 	if err != nil {
 		return err
 	}
 
-	targets := filterCaches(caches, opts)
+	targets := filterCaches(caches, opts.RefPrefix)
 
 	if opts.DryRun {
 		fmt.Printf("%d cache(s) to be deleted:\n", len(targets))
