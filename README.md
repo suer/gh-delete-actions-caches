@@ -113,7 +113,7 @@ At least one of `key-prefix` or `ref-prefix` is required. Caches are always dele
           GH_TOKEN: ${{ secrets.MY_PAT }}
 ```
 
-The action installs the extension with `gh`, so it requires a runner with the GitHub CLI available (GitHub-hosted runners have it preinstalled). Referencing a tag such as `@v0.0.2` instead of `@master` also pins the CLI version the action installs.
+The action installs the extension with `gh`, so it requires a runner with the GitHub CLI available (GitHub-hosted runners have it preinstalled). Referencing a release, either by tag (`@v0.0.3`) or by the commit the tag points at (`@05fe8335...`), also pins the CLI version the action installs. Other refs install the latest release.
 
 ## Output Format
 
