@@ -64,6 +64,57 @@ Operate on a specific repository:
 gh delete-actions-caches --key-prefix "Linux-build" -R owner/repo
 ```
 
+## GitHub Actions
+
+This repository can also be used as an action.
+
+```yaml
+      - name: Delete actions caches
+        uses: suer/gh-delete-actions-caches@master
+        with:
+          key-prefix: buildkit-blob-1-
+```
+
+The job needs the `actions: write` permission (`actions: read` is enough for `dryrun: true`).
+
+```yaml
+jobs:
+  delete-caches:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Delete actions caches
+        uses: suer/gh-delete-actions-caches@master
+        with:
+          key-prefix: buildkit-blob-1-
+          ref-prefix: refs/heads/main
+          dryrun: false
+```
+
+### Inputs
+
+- `key-prefix`: Delete caches whose key starts with this prefix
+- `ref-prefix`: Delete caches whose ref starts with this prefix
+- `dryrun`: List caches to be deleted without actually deleting (default: `false`)
+
+At least one of `key-prefix` or `ref-prefix` is required. Caches are always deleted from the repository running the workflow.
+
+### Token
+
+`${{ github.token }}` is used by default. To use another token, set `GH_TOKEN` in the workflow:
+
+```yaml
+      - name: Delete actions caches
+        uses: suer/gh-delete-actions-caches@master
+        with:
+          key-prefix: buildkit-blob-1-
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT }}
+```
+
+The action installs the extension with `gh`, so it requires a runner with the GitHub CLI available (GitHub-hosted runners have it preinstalled). Referencing a tag such as `@v0.0.2` instead of `@master` also pins the CLI version the action installs.
+
 ## Output Format
 
 ### Dry run

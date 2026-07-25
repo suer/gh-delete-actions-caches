@@ -1,0 +1,77 @@
+name: Delete actions caches
+description: Bulk delete GitHub Actions caches by key prefix or ref prefix
+branding:
+  icon: trash-2
+  color: red
+
+inputs:
+  key-prefix:
+    description: Delete caches whose key starts with this prefix
+    required: false
+    default: ""
+  ref-prefix:
+    description: Delete caches whose ref starts with this prefix
+    required: false
+    default: ""
+  dryrun:
+    description: List caches to be deleted without actually deleting
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Delete actions caches
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        export GH_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-$DEFAULT_GH_TOKEN}}"
+
+        key_prefix="${INPUT_KEY_PREFIX:-}"
+        ref_prefix="${INPUT_REF_PREFIX:-}"
+
+        if [ -z "$key_prefix" ] && [ -z "$ref_prefix" ]; then
+          echo "::error::key-prefix or ref-prefix is required"
+          exit 1
+        fi
+
+        dryrun=""
+        case "${INPUT_DRYRUN:-false}" in
+          true|TRUE|True|1)
+            dryrun="--dryrun"
+            ;;
+          false|FALSE|False|0|"")
+            ;;
+          *)
+            echo "::error::dryrun must be true or false, got '${INPUT_DRYRUN}'"
+            exit 1
+            ;;
+        esac
+
+        install_args=("${ACTION_REPOSITORY:-suer/gh-delete-actions-caches}" --force)
+        if [[ "${ACTION_REF:-}" =~ ^v[0-9] ]]; then
+          install_args+=(--pin "$ACTION_REF")
+        fi
+        gh extension install "${install_args[@]}"
+
+        args=(--repo "$REPO")
+        if [ -n "$key_prefix" ]; then
+          args+=(--key-prefix "$key_prefix")
+        fi
+        if [ -n "$ref_prefix" ]; then
+          args+=(--ref-prefix "$ref_prefix")
+        fi
+        if [ -n "$dryrun" ]; then
+          args+=("$dryrun")
+        fi
+
+        gh delete-actions-caches "${args[@]}"
+      env:
+        DEFAULT_GH_TOKEN: ${{ github.token }}
+        INPUT_KEY_PREFIX: ${{ inputs.key-prefix }}
+        INPUT_REF_PREFIX: ${{ inputs.ref-prefix }}
+        INPUT_DRYRUN: ${{ inputs.dryrun }}
+        REPO: ${{ github.repository }}
+        ACTION_REPOSITORY: ${{ github.action_repository }}
+        ACTION_REF: ${{ github.action_ref }}
