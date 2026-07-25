@@ -49,9 +49,22 @@ runs:
             ;;
         esac
 
-        install_args=("${ACTION_REPOSITORY:-suer/gh-delete-actions-caches}" --force)
-        if [[ "${ACTION_REF:-}" =~ ^v[0-9] ]]; then
-          install_args+=(--pin "$ACTION_REF")
+        extension_repo="${ACTION_REPOSITORY:-suer/gh-delete-actions-caches}"
+        action_ref="${ACTION_REF:-}"
+
+        pin=""
+        if [[ "$action_ref" =~ ^v[0-9] ]]; then
+          pin="$action_ref"
+        elif [[ "$action_ref" =~ ^[0-9a-fA-F]{40}$ ]]; then
+          sha=$(printf '%s' "$action_ref" | tr '[:upper:]' '[:lower:]')
+          tags=$(gh api --paginate "repos/$extension_repo/tags" \
+            --jq ".[] | select(.commit.sha == \"$sha\") | .name" || true)
+          pin=$(printf '%s\n' "$tags" | head -n 1)
+        fi
+
+        install_args=("$extension_repo" --force)
+        if [ -n "$pin" ]; then
+          install_args+=(--pin "$pin")
         fi
         gh extension install "${install_args[@]}"
 
