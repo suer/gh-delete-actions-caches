@@ -3,7 +3,7 @@ module github.com/suer/gh-delete-actions-caches
 go 1.26.1
 
 require (
-	github.com/cli/go-gh/v2 v2.16.1
+	github.com/cli/go-gh/v2 v2.16.2
 	github.com/spf13/cobra v1.10.2
 )
 
