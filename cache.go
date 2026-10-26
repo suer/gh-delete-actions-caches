@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	neturl "net/url"
 	"strings"
 
 	"github.com/cli/go-gh/v2/pkg/api"
@@ -26,7 +27,7 @@ func fetchCaches(client *api.RESTClient, repo repository.Repository, keyPrefix s
 		var resp listCachesResponse
 		url := fmt.Sprintf("repos/%s/%s/actions/caches?per_page=100&page=%d", repo.Owner, repo.Name, page)
 		if keyPrefix != "" {
-			url += "&key=" + keyPrefix
+			url += "&key=" + neturl.QueryEscape(keyPrefix)
 		}
 		if err := client.Get(url, &resp); err != nil {
 			return nil, err
