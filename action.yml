@@ -74,6 +74,28 @@ runs:
         fi
         gh extension install "${install_args[@]}"
 
+        ext_name="${extension_repo##*/}"
+        binary=""
+        for candidate in \
+          "${XDG_DATA_HOME:-$HOME/.local/share}/gh/extensions/$ext_name/$ext_name" \
+          "${APPDATA:-}/GitHub CLI/extensions/$ext_name/$ext_name.exe"; do
+          if [ -f "$candidate" ]; then
+            binary="$candidate"
+            break
+          fi
+        done
+        if [ -z "$binary" ]; then
+          echo "::error::installed extension binary not found; cannot verify attestation"
+          exit 1
+        fi
+
+        verify_args=("$binary" --repo "$extension_repo" \
+          --signer-workflow "$extension_repo/.github/workflows/release.yml")
+        if [ -n "$pin" ]; then
+          verify_args+=(--source-ref "refs/tags/$pin")
+        fi
+        gh attestation verify "${verify_args[@]}" >/dev/null
+
         args=(--repo "$REPO")
         if [ -n "$key_prefix" ]; then
           args+=(--key-prefix "$key_prefix")
