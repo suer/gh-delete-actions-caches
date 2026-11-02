@@ -20,8 +20,22 @@ type Options struct {
 func rootCmd() *cobra.Command {
 	opts := &Options{}
 	cmd := &cobra.Command{
-		Use:           "gh delete-actions-caches",
-		Short:         "Delete GitHub Actions caches by key prefix or ref prefix",
+		Use:   "gh delete-actions-caches",
+		Short: "Delete GitHub Actions caches by key prefix or ref prefix",
+		Example: `  # Delete caches by key prefix
+  gh delete-actions-caches -k Linux-build
+
+  # Delete caches by ref prefix
+  gh delete-actions-caches -r refs/heads/feature/
+
+  # Match both key prefix and ref prefix (AND)
+  gh delete-actions-caches -k Linux-build -r refs/heads/main
+
+  # Preview caches to be deleted (dry run)
+  gh delete-actions-caches -k Linux-build -d
+
+  # Target a specific repository
+  gh delete-actions-caches -k Linux-build -R owner/repo`,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return run(opts)
@@ -29,10 +43,10 @@ func rootCmd() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&opts.Version, "version", false, "show version")
-	cmd.Flags().StringVarP(&opts.KeyPrefix, "key-prefix", "k", "", "delete caches whose key starts with this prefix")
-	cmd.Flags().StringVarP(&opts.RefPrefix, "ref-prefix", "r", "", "delete caches whose ref starts with this prefix")
-	cmd.Flags().BoolVarP(&opts.DryRun, "dryrun", "d", false, "list caches to be deleted without actually deleting")
-	cmd.Flags().StringVarP(&opts.Repo, "repo", "R", "", "target repository (OWNER/REPO)")
+	cmd.Flags().StringVarP(&opts.KeyPrefix, "key-prefix", "k", "", "Delete caches whose key starts with this `prefix`")
+	cmd.Flags().StringVarP(&opts.RefPrefix, "ref-prefix", "r", "", "Delete caches whose ref starts with this `prefix`")
+	cmd.Flags().BoolVarP(&opts.DryRun, "dryrun", "d", false, "List caches to be deleted without actually deleting")
+	cmd.Flags().StringVarP(&opts.Repo, "repo", "R", "", "Target `repository` (OWNER/REPO)")
 
 	return cmd
 }
